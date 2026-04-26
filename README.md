@@ -1,50 +1,154 @@
-# Welcome to your Expo app 👋
+# AperoGame Mobile 🎲
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Application mobile développée avec [Expo](https://expo.dev) et [React Native](https://reactnative.dev).
 
-## Get started
+---
 
-1. Install dependencies
+## Prérequis
 
-   ```bash
-   npm install
-   ```
+- [Node.js](https://nodejs.org) >= 18
+- [npm](https://www.npmjs.com) >= 9
+- [Expo Go](https://expo.dev/go) sur iOS ou Android pour tester sur appareil physique
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Installation
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## Lancement
 
-To learn more about developing your project with Expo, look at the following resources:
+### Démarrer le serveur de développement
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm start
+```
 
-## Join the community
+Un QR code s'affiche dans le terminal. Scannez-le avec **Expo Go** (Android) ou l'appareil photo (iOS) pour lancer l'app sur votre téléphone.
 
-Join our community of developers creating universal apps.
+### Lancer sur simulateur iOS
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npm run ios
+```
+
+### Lancer sur émulateur Android
+
+```bash
+npm run android
+```
+
+### Lancer dans le navigateur
+
+```bash
+npm run web
+```
+
+---
+
+## Build
+
+Les builds de production sont gérés via **[EAS Build](https://docs.expo.dev/build/introduction/)** (Expo Application Services).
+
+### Installation de EAS CLI
+
+```bash
+npm install -g eas-cli
+eas login
+```
+
+### Build iOS (`.ipa`)
+
+```bash
+eas build --platform ios
+```
+
+### Build Android (`.apk` / `.aab`)
+
+```bash
+eas build --platform android
+```
+
+### Build pour les deux plateformes
+
+```bash
+eas build --platform all
+```
+
+---
+
+## Autres commandes
+
+| Commande | Description |
+|---|---|
+| `npm run lint` | Analyse statique du code |
+| `npm run reset-project` | Réinitialise le projet (déplace le code de démarrage dans `app-example`) |
+
+---
+
+## Conventions de contribution
+
+### Messages de commit
+
+Les messages de commit sont validés automatiquement par **Husky + Commitlint** à chaque `git commit`.
+
+**Format :**
+```
+type: description courte
+```
+
+**Types autorisés :**
+
+| Type | Usage |
+|---|---|
+| `feat` | Nouvelle fonctionnalité |
+| `fix` | Correction de bug |
+| `docs` | Documentation |
+| `style` | Formatage (sans changement de logique) |
+| `refactor` | Refactorisation du code |
+| `test` | Ajout ou modification de tests |
+| `chore` | Maintenance (build, dépendances…) |
+| `perf` | Amélioration des performances |
+| `ci` | Changements CI/CD |
+| `revert` | Annulation d'un commit précédent |
+
+**Règles :**
+- La description ne doit pas commencer par une majuscule
+- 100 caractères maximum
+
+**Exemples :**
+```bash
+git commit -m "feat: ajout de l'écran de jeu"   # ✅
+git commit -m "fix: correction du score nul"     # ✅
+git commit -m "Ajout de trucs"                   # ❌ type manquant
+git commit -m "FEAT: nouvelle page"              # ❌ type en majuscules
+```
+
+---
+
+### Titres de Merge Request
+
+Les titres de MR sont validés automatiquement par la **CI/CD GitLab** à l'ouverture ou la modification d'une MR.
+
+**Format :**
+```
+type: [Subject] description courte
+```
+
+- `type` — même liste que pour les commits
+- `[Subject]` — contexte entre crochets (ex : `[Auth]`, `[Score]`, `[CI]`)
+- `description courte` — 100 caractères maximum au total
+
+**Exemples :**
+```
+feat: [Auth] ajout de la connexion Google        ✅
+fix: [Score] correction du calcul des points     ✅
+chore: [CI] mise à jour du pipeline              ✅
+update: [Auth] type invalide                     ❌
+feat: [Auth]                                     ❌ description manquante
+feat: Auth ajout de la page                      ❌ crochets manquants
+```
