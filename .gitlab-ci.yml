@@ -1,0 +1,33 @@
+stages:
+  - lint
+
+check-mr-title:
+  stage: lint
+  image: alpine:latest
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - |
+      TITLE="$CI_MERGE_REQUEST_TITLE"
+      echo "Vérification du titre de la MR : '$TITLE'"
+
+      LENGTH=${#TITLE}
+      if [ "$LENGTH" -gt 100 ]; then
+        echo "Le titre est trop long ($LENGTH caractères). Maximum autorisé : 100 caractères."
+        exit 1
+      fi
+
+      PATTERN='^(feat|fix|docs|style|refactor|test|chore|perf|ci|revert): \[[A-Za-z0-9_-]+\] .+$'
+
+      if ! echo "$TITLE" | grep -Eq "$PATTERN"; then
+        echo "Le titre de la MR ne respecte pas le format attendu."
+        echo ""
+        echo "   Format attendu  : type: [Subject] desc"
+        echo "   Exemple valide  : feat: [Auth] ajout de la connexion Google"
+        echo ""
+        echo "   Types autorisés : feat, fix, docs, style, refactor, test, chore, perf, ci, revert"
+        exit 1
+      fi
+
+      echo "Titre de la MR valide !"
+
