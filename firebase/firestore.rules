@@ -1,0 +1,70 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helpers ───────────────────────────────────────────────────────────
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'email', 'createdAt', 'stats'])
+        && data.uid is string
+        && data.displayName is string
+        && data.email is string
+        && data.createdAt is int;
+    }
+
+    function isValidStats(stats) {
+      return stats.keys().hasAll([
+          'gamesPlayed', 'gagesCompleted', 'gagesRefused',
+          'wins', 'totalDrinksGiven', 'totalDrinksReceived'
+        ])
+        && stats.gamesPlayed is int
+        && stats.gamesPlayed >= 0;
+    }
+
+    // ─── users/{uid} ───────────────────────────────────────────────────────
+    match /users/{uid} {
+      // Lecture : l'utilisateur lui-même uniquement
+      allow read: if isOwner(uid);
+
+      // Création : lors de l'inscription, l'utilisateur crée son propre document
+      allow create: if isOwner(uid)
+        && isValidUser(request.resource.data)
+        && isValidStats(request.resource.data.stats);
+
+      // Mise à jour : uniquement le propriétaire, stats ne peuvent qu'augmenter
+      allow update: if isOwner(uid)
+        && isValidUser(request.resource.data)
+        && isValidStats(request.resource.data.stats)
+        && request.resource.data.stats.gamesPlayed >= resource.data.stats.gamesPlayed
+        && request.resource.data.stats.wins >= resource.data.stats.wins;
+
+      allow delete: if false;
+    }
+
+    // ─── gages/{gageId} ────────────────────────────────────────────────────
+    match /gages/{gageId} {
+      // Tout utilisateur connecté peut lire le catalogue
+      allow read: if isAuth();
+      // Écriture réservée aux admins (via Admin SDK / Cloud Functions)
+      allow write: if false;
+    }
+
+    // ─── game_history/{gameId} ─────────────────────────────────────────────
+    match /game_history/{gameId} {
+      // Un joueur peut lire l'historique des parties auxquelles il a participé
+      allow read: if isAuth()
+        && request.auth.uid in resource.data.playerIds;
+
+      // Écriture uniquement via Cloud Functions (Admin SDK)
+      allow write: if false;
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "268828924364",
+    "firebase_url": "https://native-game-aa0af-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "native-game-aa0af",
+    "storage_bucket": "native-game-aa0af.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:268828924364:android:77743d9a05592f2f3f6569",
+        "android_client_info": {
+          "package_name": "com.aperogame.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_n-579uPbFKXBMGtLhB5GHVYj3BVfLxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
