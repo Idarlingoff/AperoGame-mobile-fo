@@ -87,6 +87,48 @@ eas build --platform all
 |---|---|
 | `npm run lint` | Analyse statique du code |
 | `npm run reset-project` | Réinitialise le projet (déplace le code de démarrage dans `app-example`) |
+| `npm run seed:gages` | Peuple la collection `gages` dans Firestore |
+
+---
+
+## Firebase
+
+### Prérequis
+
+- Avoir un projet Firebase avec **Authentication**, **Firestore** et **Realtime Database** activés
+- `google-services.json` (Android) à la racine du projet — téléchargeable depuis Firebase Console → Project Settings → Your apps
+- `service-account.json` (Admin SDK) à la racine pour les scripts admin — téléchargeable depuis Firebase Console → Project Settings → Service accounts → Generate new private key
+
+> Ces deux fichiers sont exclus du dépôt git (`.gitignore`).
+
+### Initialisation (première fois)
+
+```bash
+# Connexion à Firebase CLI
+firebase login
+
+# Déploiement des règles de sécurité
+firebase deploy --only firestore:rules,firestore:indexes,database:rules
+```
+
+### Seed des données initiales
+
+La collection `gages` doit être peuplée manuellement avant la première utilisation :
+
+```bash
+npm run seed:gages
+```
+
+Le contenu des gages est défini dans `scripts/gages-data.json` (18 gages répartis sur 3 niveaux : `soft`, `epice`, `chaos`).
+
+### Commandes Firebase utiles
+
+| Commande | Description |
+|---|---|
+| `firebase deploy --only firestore:rules` | Déploie uniquement les règles Firestore |
+| `firebase deploy --only database:rules` | Déploie uniquement les règles Realtime DB |
+| `firebase deploy --only firestore:indexes` | Déploie les index Firestore |
+| `firebase emulators:start` | Lance les émulateurs Firebase en local |
 
 ---
 

@@ -1,0 +1,110 @@
+[
+  {
+    "text": "Bois 1 gorgée",
+    "emoji": "🍺",
+    "level": "soft",
+    "drinksIfRefused": 2
+  },
+  {
+    "text": "Dis le prénom de ton ex sans sourire",
+    "emoji": "😐",
+    "level": "soft",
+    "drinksIfRefused": 2
+  },
+  {
+    "text": "Imite quelqu'un dans le groupe jusqu'à ce qu'on te trouve",
+    "emoji": "🎭",
+    "level": "soft",
+    "drinksIfRefused": 2
+  },
+  {
+    "text": "Dis un compliment sincère à la personne à ta gauche",
+    "emoji": "💬",
+    "level": "soft",
+    "drinksIfRefused": 2
+  },
+  {
+    "text": "Poste une photo de ton écran de veille en story",
+    "emoji": "📱",
+    "level": "soft",
+    "drinksIfRefused": 3
+  },
+  {
+    "text": "Montre le dernier mème que tu as envoyé",
+    "emoji": "😂",
+    "level": "soft",
+    "drinksIfRefused": 2
+  },
+  {
+    "text": "Appelle quelqu'un au hasard dans tes contacts et parle 30 secondes",
+    "emoji": "📞",
+    "level": "epice",
+    "drinksIfRefused": 4
+  },
+  {
+    "text": "Montre tes 3 derniers messages envoyés",
+    "emoji": "💌",
+    "level": "epice",
+    "drinksIfRefused": 3
+  },
+  {
+    "text": "Fais un gage choisi par le groupe",
+    "emoji": "🎯",
+    "level": "epice",
+    "drinksIfRefused": 4
+  },
+  {
+    "text": "Dis ta pire qualité sans rire",
+    "emoji": "😬",
+    "level": "epice",
+    "drinksIfRefused": 3
+  },
+  {
+    "text": "Envoie un vocal embarrassant à quelqu'un de ton choix",
+    "emoji": "🎙️",
+    "level": "epice",
+    "drinksIfRefused": 4
+  },
+  {
+    "text": "Raconte ta pire soirée devant tout le monde",
+    "emoji": "🫣",
+    "level": "epice",
+    "drinksIfRefused": 3
+  },
+  {
+    "text": "Change ta photo de profil pour 1 heure selon ce que décide le groupe",
+    "emoji": "📸",
+    "level": "chaos",
+    "drinksIfRefused": 5
+  },
+  {
+    "text": "Écris un message gênant à la personne que tu veux et montre-le avant d'envoyer",
+    "emoji": "😈",
+    "level": "chaos",
+    "drinksIfRefused": 5
+  },
+  {
+    "text": "Bois cul-sec",
+    "emoji": "💀",
+    "level": "chaos",
+    "drinksIfRefused": 6
+  },
+  {
+    "text": "Le groupe choisit un statut que tu gardes 24h",
+    "emoji": "🔥",
+    "level": "chaos",
+    "drinksIfRefused": 5
+  },
+  {
+    "text": "Fais un tour de danse en solo",
+    "emoji": "🕺",
+    "level": "chaos",
+    "drinksIfRefused": 5
+  },
+  {
+    "text": "Avoue quelque chose que personne ne sait sur toi",
+    "emoji": "🤫",
+    "level": "chaos",
+    "drinksIfRefused": 6
+  }
+]
