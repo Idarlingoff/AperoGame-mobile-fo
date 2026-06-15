@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { COLORS, SPACING, FONT_SIZE, BORDER_RADIUS } from '../../constants';
-import { MAX_LIVES } from '../../constants';
+import { COLORS, SPACING, FONT_SIZE, BORDER_RADIUS, MAX_LIVES } from '../../constants';
 import type { Player } from '../../types';
 
 interface PlayerCardProps {
