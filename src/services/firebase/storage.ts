@@ -1,18 +1,23 @@
-import storage from '@react-native-firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from './config';
 
 export const uploadProfilePhoto = async (uid: string, localUri: string): Promise<string> => {
-    const ref = storage().ref(`profiles/${uid}/avatar.jpg`);
-    await ref.putFile(localUri);
-    return ref.getDownloadURL();
+  const storageRef = ref(storage, `profiles/${uid}/avatar.jpg`);
+  const response = await fetch(localUri);
+  const blob = await response.blob();
+  await uploadBytes(storageRef, blob);
+  return getDownloadURL(storageRef);
 };
 
 export const uploadGageValidationPhoto = async (
-    gameId: string,
-    turnNumber: number,
-    playerId: string,
-    localUri: string,
+  gameId: string,
+  turnNumber: number,
+  playerId: string,
+  localUri: string,
 ): Promise<string> => {
-    const ref = storage().ref(`games/${gameId}/turns/${turnNumber}/${playerId}.jpg`);
-    await ref.putFile(localUri);
-    return ref.getDownloadURL();
+  const storageRef = ref(storage, `games/${gameId}/turns/${turnNumber}/${playerId}.jpg`);
+  const response = await fetch(localUri);
+  const blob = await response.blob();
+  await uploadBytes(storageRef, blob);
+  return getDownloadURL(storageRef);
 };

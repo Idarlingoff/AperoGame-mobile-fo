@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Button } from '../src/components/ui';
-import { COLORS, FONT_SIZE, SPACING } from '../src/constants';
-import { signOut } from '../src/services/firebase/auth';
-import { useAuthStore } from '../src/store';
+import { Button } from '@components/ui';
+import { COLORS, FONT_SIZE, SPACING } from '@/src/constants';
+import { signOut } from '@services/firebase';
+import { useAuthStore } from '@/src/store';
 
 export default function SettingsScreen() {
   const { user, isAuthenticated } = useAuthStore();

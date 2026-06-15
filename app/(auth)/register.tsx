@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Button } from '../../src/components/ui';
-import { BORDER_RADIUS, COLORS, FONT_SIZE, SPACING } from '../../src/constants';
-import { signUp } from '../../src/services/firebase/auth';
+import { Button } from '@components/ui';
+import { BORDER_RADIUS, COLORS, FONT_SIZE, SPACING } from '@/src/constants';
+import { signUp } from '@services/firebase';
 
 export default function RegisterScreen() {
   const [displayName, setDisplayName] = useState('');
@@ -19,7 +19,8 @@ export default function RegisterScreen() {
     try {
       await signUp(email, password, displayName);
       router.replace('/');
-    } catch {
+    } catch (e) {
+      console.error('Erreur inscription:', e);
       setError('Erreur lors de l\'inscription. Veuillez réessayer.');
     } finally {
       setIsLoading(false);

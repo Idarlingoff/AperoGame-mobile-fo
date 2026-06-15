@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Button } from '../../src/components/ui';
-import { BORDER_RADIUS, COLORS, FONT_SIZE, SPACING } from '../../src/constants';
-import { signIn } from '../../src/services/firebase/auth';
+import { Button } from '@components/ui';
+import { BORDER_RADIUS, COLORS, FONT_SIZE, SPACING } from '@/src/constants';
+import { signIn } from '@services/firebase';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
