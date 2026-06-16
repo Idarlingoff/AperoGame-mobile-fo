@@ -156,7 +156,7 @@ export default function PlayScreen() {
             <View style={styles.feedbackCard}>
               <ActivityIndicator size="large" color={COLORS.neonBlue} />
               <Text style={styles.feedbackTitle}>Chargement de la partie</Text>
-              <Text style={styles.feedbackText}>Mise en place de l&apos;ecran de jeu...</Text>
+              <Text style={styles.feedbackText}>Mise en place de l&apos;écran de jeu...</Text>
             </View>
           ) : errorMessage || !game || !currentTurn || !currentMiniGame ? (
             <View style={styles.feedbackCard}>
