@@ -1,6 +1,6 @@
 import { Button } from '@/src/components/ui';
 import { BORDER_RADIUS, COLORS, FONT_SIZE, MAX_PLAYERS, SPACING } from '@/src/constants';
-import { getGameById } from '@/src/services/game';
+import { getGameById, startGame } from '@/src/services/game';
 import type { Game } from '@/src/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -20,6 +20,7 @@ export default function LobbyScreen() {
   const { gameId } = useLocalSearchParams<{ gameId?: string | string[] }>();
   const [game, setGame] = useState<Game | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isStartingGame, setIsStartingGame] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const resolvedGameId = Array.isArray(gameId) ? gameId[0] : gameId;
@@ -77,6 +78,27 @@ export default function LobbyScreen() {
   const maxPlayers = game?.maxPlayers ?? MAX_PLAYERS;
   const connectedPlayers = players.length;
   const slots = Array.from({ length: maxPlayers }, (_, index) => players[index] ?? null);
+
+  const handleStartGame = async () => {
+    if (!game) {
+      return;
+    }
+
+    setIsStartingGame(true);
+
+    try {
+      const startedGame = await startGame(game.id);
+
+      if (!startedGame) {
+        setErrorMessage('Impossible de lancer cette partie.');
+        return;
+      }
+
+      router.push(`/play/${startedGame.id}`);
+    } finally {
+      setIsStartingGame(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -239,10 +261,17 @@ export default function LobbyScreen() {
 
                 <View style={styles.actions}>
                   <Button
-                    label="En attente de l'hôte"
+                    label={game?.status === 'playing' ? 'Rejoindre la partie' : 'Lancer la partie'}
                     size="lg"
-                    leftIcon={<Ionicons name="time-outline" size={22} color={COLORS.text} />}
-                    disabled
+                    leftIcon={
+                      <Ionicons
+                        name={game?.status === 'playing' ? 'game-controller-outline' : 'play-outline'}
+                        size={22}
+                        color={COLORS.text}
+                      />
+                    }
+                    onPress={handleStartGame}
+                    isLoading={isStartingGame}
                     style={styles.cta}
                   />
                   <Button
