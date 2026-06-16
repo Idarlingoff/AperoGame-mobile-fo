@@ -45,7 +45,7 @@ export default function HomeScreen() {
               variant="outline"
               size="lg"
               leftIcon={<Ionicons name="person-add-outline" size={22} color={COLORS.primary} />}
-              onPress={() => {}}
+              onPress={() => router.push('/register')}
               style={styles.secondaryCta}
             />
           </View>
