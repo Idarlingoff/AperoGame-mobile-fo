@@ -60,10 +60,8 @@ export default function PlayScreen() {
         return;
       }
 
-      const playableGame =
-        existingGame.currentTurn || existingGame.status === 'playing'
-          ? existingGame
-          : await startGame(existingGame.id);
+      const shouldStartGame = !existingGame.currentTurn && existingGame.status !== 'finished';
+      const playableGame = shouldStartGame ? await startGame(existingGame.id) : existingGame;
 
       if (!isMounted) {
         return;
