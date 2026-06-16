@@ -69,7 +69,7 @@ export default function PlayScreen() {
 
       if (!playableGame) {
         setGame(null);
-        setErrorMessage('Impossible de preparer cette partie.');
+        setErrorMessage('Impossible de préparer cette partie.');
         setIsLoading(false);
         return;
       }
