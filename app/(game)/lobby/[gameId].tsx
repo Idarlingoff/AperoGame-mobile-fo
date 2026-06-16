@@ -1,7 +1,8 @@
 import { Button } from '@/src/components/ui';
 import { BORDER_RADIUS, COLORS, FONT_SIZE, MAX_PLAYERS, SPACING } from '@/src/constants';
-import { getGameById, startGame } from '@/src/services/game';
-import type { Game } from '@/src/types';
+import { startGame } from '@/src/features/game';
+import { useGame } from '@/src/hooks';
+import { useAuthStore, useGameStore } from '@/src/store';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -18,52 +19,24 @@ import {
 export default function LobbyScreen() {
   const router = useRouter();
   const { gameId } = useLocalSearchParams<{ gameId?: string | string[] }>();
-  const [game, setGame] = useState<Game | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const resolvedGameId = Array.isArray(gameId) ? gameId[0] : (gameId ?? null);
+
+  const user = useAuthStore((state) => state.user);
+  const game = useGameStore((state) => state.currentGame);
+
   const [isStartingGame, setIsStartingGame] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const resolvedGameId = Array.isArray(gameId) ? gameId[0] : gameId;
+  useGame(resolvedGameId, user?.uid ?? null);
 
+  // Everyone is sent to the play screen once the host launches the game.
   useEffect(() => {
-    let isMounted = true;
+    if (game?.status === 'playing' && resolvedGameId) {
+      router.push(`/play/${resolvedGameId}`);
+    }
+  }, [game?.status, resolvedGameId, router]);
 
-    const loadGame = async () => {
-      if (!resolvedGameId) {
-        if (isMounted) {
-          setErrorMessage('Impossible de retrouver cette partie.');
-          setIsLoading(false);
-        }
-        return;
-      }
-
-      setIsLoading(true);
-      setErrorMessage('');
-
-      const nextGame = await getGameById(resolvedGameId);
-
-      if (!isMounted) {
-        return;
-      }
-
-      if (!nextGame) {
-        setGame(null);
-        setErrorMessage('Cette partie est introuvable.');
-        setIsLoading(false);
-        return;
-      }
-
-      setGame(nextGame);
-      setIsLoading(false);
-    };
-
-    void loadGame();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [resolvedGameId]);
-
+  const isHost = Boolean(user && game && user.uid === game.hostId);
   const players = game
     ? Object.values(game.players).sort((leftPlayer, rightPlayer) => {
         if (leftPlayer.isHost === rightPlayer.isHost) {
@@ -78,23 +51,21 @@ export default function LobbyScreen() {
   const maxPlayers = game?.maxPlayers ?? MAX_PLAYERS;
   const connectedPlayers = players.length;
   const slots = Array.from({ length: maxPlayers }, (_, index) => players[index] ?? null);
+  const isLoading = !game && !errorMessage;
 
   const handleStartGame = async () => {
-    if (!game) {
+    if (!resolvedGameId) {
       return;
     }
 
     setIsStartingGame(true);
+    setErrorMessage('');
 
     try {
-      const startedGame = await startGame(game.id);
-
-      if (!startedGame) {
-        setErrorMessage('Impossible de lancer cette partie.');
-        return;
-      }
-
-      router.push(`/play/${startedGame.id}`);
+      await startGame(resolvedGameId);
+      // Navigation is handled by the effect above once status flips to 'playing'.
+    } catch {
+      setErrorMessage('Impossible de lancer cette partie.');
     } finally {
       setIsStartingGame(false);
     }
@@ -260,20 +231,23 @@ export default function LobbyScreen() {
                 </View>
 
                 <View style={styles.actions}>
-                  <Button
-                    label={game?.status === 'playing' ? 'Rejoindre la partie' : 'Lancer la partie'}
-                    size="lg"
-                    leftIcon={
-                      <Ionicons
-                        name={game?.status === 'playing' ? 'game-controller-outline' : 'play-outline'}
-                        size={22}
-                        color={COLORS.text}
-                      />
-                    }
-                    onPress={handleStartGame}
-                    isLoading={isStartingGame}
-                    style={styles.cta}
-                  />
+                  {isHost ? (
+                    <Button
+                      label="Lancer la partie"
+                      size="lg"
+                      leftIcon={<Ionicons name="play-outline" size={22} color={COLORS.text} />}
+                      onPress={handleStartGame}
+                      isLoading={isStartingGame}
+                      style={styles.cta}
+                    />
+                  ) : (
+                    <View style={styles.waitingHost}>
+                      <Ionicons name="hourglass-outline" size={20} color={COLORS.textSecondary} />
+                      <Text style={styles.waitingHostText}>
+                        En attente que l&apos;hôte lance la partie...
+                      </Text>
+                    </View>
+                  )}
                   <Button
                     label="Quitter la partie"
                     variant="ghost"
@@ -657,6 +631,24 @@ const styles = StyleSheet.create({
   },
   actions: {
     gap: SPACING.sm,
+  },
+  waitingHost: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  waitingHostText: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZE.md,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   cta: {
     paddingVertical: SPACING.md,

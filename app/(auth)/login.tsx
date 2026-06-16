@@ -321,12 +321,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderColor: COLORS.border,
     backgroundColor: 'rgba(255,255,255,0.06)',
     color: COLORS.text,
     fontSize: FONT_SIZE.md,
-    borderWidth: 1,
-    borderColor: COLORS.border,
   },
   error: {
     color: COLORS.error,

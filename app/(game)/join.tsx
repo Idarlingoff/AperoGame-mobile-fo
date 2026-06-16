@@ -1,6 +1,7 @@
 import { Button } from '@/src/components/ui';
 import { BORDER_RADIUS, COLORS, FONT_SIZE, GAME_CODE_LENGTH, SPACING } from '@/src/constants';
-import { getGameByCode } from '@/src/services/game';
+import { joinGame } from '@/src/features/game';
+import { useAuthStore } from '@/src/store';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -18,6 +19,7 @@ import {
 
 export default function JoinGameScreen() {
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
   const [code, setCode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,22 +33,20 @@ export default function JoinGameScreen() {
     }
 
     setErrorMessage('');
+
+    if (!user) {
+      setErrorMessage('Tu dois être connecté pour rejoindre une partie.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const game = await getGameByCode(formattedCode);
+      const gameId = await joinGame(formattedCode, user.uid, user.displayName, user.photoURL);
 
-      if (!game) {
-        setErrorMessage('Aucune partie ne correspond à ce code.');
-        return;
-      }
-
-      if (game.status !== 'lobby') {
-        setErrorMessage("Cette partie n'est plus disponible.");
-        return;
-      }
-
-      router.push(`/lobby/${game.id}`);
+      router.push(`/lobby/${gameId}`);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Une erreur est survenue.');
     } finally {
       setIsSubmitting(false);
     }

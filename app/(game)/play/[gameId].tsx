@@ -1,17 +1,12 @@
 import { Button } from '@/src/components/ui';
-import {
-  BORDER_RADIUS,
-  COLORS,
-  FONT_SIZE,
-  MAX_LIVES,
-  MINI_GAMES,
-  SPACING,
-} from '@/src/constants';
-import { advanceGameTurn, getGameById, startGame } from '@/src/services/game';
-import type { Game } from '@/src/types';
+import { BORDER_RADIUS, COLORS, FONT_SIZE, MAX_LIVES, MINI_GAMES, SPACING } from '@/src/constants';
+import { ReactionGame } from '@/src/features/mini-games/reaction/ReactionGame';
+import { ShiFuMiGame } from '@/src/features/mini-games/shi-fu-mi/ShiFuMiGame';
+import { useGame, useMiniGame, useTurn } from '@/src/hooks';
+import { useAuthStore, useGameStore } from '@/src/store';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -25,65 +20,30 @@ import {
 export default function PlayScreen() {
   const router = useRouter();
   const { gameId } = useLocalSearchParams<{ gameId?: string | string[] }>();
-  const [game, setGame] = useState<Game | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAdvancingTurn, setIsAdvancingTurn] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const resolvedGameId = Array.isArray(gameId) ? gameId[0] : (gameId ?? null);
 
-  const resolvedGameId = Array.isArray(gameId) ? gameId[0] : gameId;
+  const user = useAuthStore((state) => state.user);
+  const game = useGameStore((state) => state.currentGame);
+  const isHost = Boolean(user && game && user.uid === game.hostId);
 
+  useGame(resolvedGameId, user?.uid ?? null);
+  const { phase, timeLeft, handleGageValidation } = useTurn(resolvedGameId, isHost);
+  const { onFinish, reset } = useMiniGame(resolvedGameId, user?.uid ?? null);
+
+  const currentTurn = game?.currentTurn ?? null;
+  const currentMiniGame = currentTurn ? MINI_GAMES[currentTurn.miniGameId] : null;
+
+  // Reset the per-device mini-game guard at the start of each turn.
   useEffect(() => {
-    let isMounted = true;
+    reset();
+  }, [currentTurn?.number, reset]);
 
-    const loadGame = async () => {
-      if (!resolvedGameId) {
-        if (isMounted) {
-          setErrorMessage('Impossible de retrouver cette partie.');
-          setIsLoading(false);
-        }
-        return;
-      }
-
-      setIsLoading(true);
-      setErrorMessage('');
-
-      const existingGame = await getGameById(resolvedGameId);
-
-      if (!isMounted) {
-        return;
-      }
-
-      if (!existingGame) {
-        setGame(null);
-        setErrorMessage('Cette partie est introuvable.');
-        setIsLoading(false);
-        return;
-      }
-
-      const shouldStartGame = !existingGame.currentTurn && existingGame.status !== 'finished';
-      const playableGame = shouldStartGame ? await startGame(existingGame.id) : existingGame;
-
-      if (!isMounted) {
-        return;
-      }
-
-      if (!playableGame) {
-        setGame(null);
-        setErrorMessage('Impossible de préparer cette partie.');
-        setIsLoading(false);
-        return;
-      }
-
-      setGame(playableGame);
-      setIsLoading(false);
-    };
-
-    void loadGame();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [resolvedGameId]);
+  // Everyone is sent to the results screen once the game finishes.
+  useEffect(() => {
+    if (game?.status === 'finished' && resolvedGameId) {
+      router.push(`/results/${resolvedGameId}`);
+    }
+  }, [game?.status, resolvedGameId, router]);
 
   const orderedPlayers = game
     ? Object.values(game.players).sort((leftPlayer, rightPlayer) => {
@@ -94,29 +54,47 @@ export default function PlayScreen() {
         return leftPlayer.isHost ? -1 : 1;
       })
     : [];
-  const currentTurn = game?.currentTurn ?? null;
-  const currentMiniGame = currentTurn ? MINI_GAMES[currentTurn.miniGameId] : null;
-  const gageValidationCount = currentTurn ? Object.keys(currentTurn.gageValidations).length : 0;
-  const isGameFinished = game?.status === 'finished';
+  const loserPlayer =
+    currentTurn?.loserId && game ? (game.players[currentTurn.loserId] ?? null) : null;
+  const validations = currentTurn?.gageValidations ?? {};
+  const gageValidationCount = Object.keys(validations).length;
+  const hasValidated = Boolean(user && validations[user.uid] !== undefined);
+  const isLoading = !game;
 
-  const handleNextTurn = async () => {
-    if (!game) {
-      return;
+  const renderMiniGame = () => {
+    if (!currentMiniGame || !currentTurn) {
+      return null;
     }
 
-    setIsAdvancingTurn(true);
-
-    try {
-      const nextGame = await advanceGameTurn(game.id);
-
-      if (!nextGame) {
-        setErrorMessage('Impossible de charger le tour suivant.');
-        return;
-      }
-
-      setGame(nextGame);
-    } finally {
-      setIsAdvancingTurn(false);
+    switch (currentTurn.miniGameId) {
+      case 'reaction':
+        return (
+          <ReactionGame
+            key={currentTurn.number}
+            durationSeconds={currentMiniGame.durationSeconds}
+            onFinish={onFinish}
+          />
+        );
+      case 'shi-fu-mi':
+        return (
+          <ShiFuMiGame
+            key={currentTurn.number}
+            durationSeconds={currentMiniGame.durationSeconds}
+            onFinish={onFinish}
+          />
+        );
+      default:
+        return (
+          <View style={styles.placeholderArea}>
+            <View style={styles.placeholderBadge}>
+              <Ionicons name="construct-outline" size={20} color={COLORS.neonBlue} />
+            </View>
+            <Text style={styles.placeholderTitle}>Jeu à venir</Text>
+            <Text style={styles.placeholderText}>
+              Ce mini-jeu n&apos;est pas encore intégré. Le tour passera automatiquement.
+            </Text>
+          </View>
+        );
     }
   };
 
@@ -158,54 +136,76 @@ export default function PlayScreen() {
               <Text style={styles.feedbackTitle}>Chargement de la partie</Text>
               <Text style={styles.feedbackText}>Mise en place de l&apos;écran de jeu...</Text>
             </View>
-          ) : errorMessage || !game || !currentTurn || !currentMiniGame ? (
+          ) : !currentTurn || !currentMiniGame ? (
             <View style={styles.feedbackCard}>
               <Ionicons name="alert-circle-outline" size={36} color={COLORS.error} />
               <Text style={styles.feedbackTitle}>Partie indisponible</Text>
-              <Text style={styles.feedbackText}>
-                {errorMessage || 'Impossible d&apos;afficher le tour en cours.'}
-              </Text>
+              <Text style={styles.feedbackText}>Impossible d&apos;afficher le tour en cours.</Text>
               <Button
                 label="Retour au lobby"
                 size="lg"
                 leftIcon={<Ionicons name="arrow-back-outline" size={22} color={COLORS.text} />}
-                onPress={() => router.back()}
+                onPress={() => router.push(`/lobby/${resolvedGameId}`)}
                 style={styles.primaryButton}
               />
             </View>
-          ) : (
-            <>
-              <View style={styles.gageCard}>
-                <View style={styles.sectionHeader}>
-                  <Ionicons name="sparkles-outline" size={22} color={COLORS.neonPink} />
-                  <Text style={styles.sectionTitle}>Gage du tour</Text>
+          ) : phase === 'gage' ? (
+            <View style={styles.gageCard}>
+              <View style={styles.sectionHeader}>
+                <Ionicons name="sparkles-outline" size={22} color={COLORS.neonPink} />
+                <Text style={styles.sectionTitle}>Gage du tour</Text>
+              </View>
+
+              {loserPlayer ? (
+                <Text style={styles.loserText}>{loserPlayer.displayName} doit relever le défi !</Text>
+              ) : null}
+
+              <Text style={styles.gageText}>{currentTurn.gage.text}</Text>
+
+              <View style={styles.gageMetaRow}>
+                <View style={styles.gageMetaCard}>
+                  <Ionicons name="wine-outline" size={22} color={COLORS.text} />
+                  <View style={styles.gageMetaTextBlock}>
+                    <Text style={styles.gageMetaLabel}>Refuser</Text>
+                    <Text style={styles.gageMetaValue}>+{currentTurn.gage.drinksIfRefused} coup</Text>
+                  </View>
                 </View>
 
-                <Text style={styles.gageText}>{currentTurn.gage.text}</Text>
-
-                <View style={styles.gageMetaRow}>
-                  <View style={styles.gageMetaCard}>
-                    <Ionicons name="wine-outline" size={22} color={COLORS.text} />
-                    <View style={styles.gageMetaTextBlock}>
-                      <Text style={styles.gageMetaLabel}>Refuser</Text>
-                      <Text style={styles.gageMetaValue}>
-                        +{currentTurn.gage.drinksIfRefused} coup
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.gageMetaCard}>
-                    <Ionicons name="shield-checkmark-outline" size={22} color={COLORS.text} />
-                    <View style={styles.gageMetaTextBlock}>
-                      <Text style={styles.gageMetaLabel}>Validation</Text>
-                      <Text style={styles.gageMetaValue}>
-                        {gageValidationCount} / {orderedPlayers.length} joueurs
-                      </Text>
-                    </View>
+                <View style={styles.gageMetaCard}>
+                  <Ionicons name="shield-checkmark-outline" size={22} color={COLORS.text} />
+                  <View style={styles.gageMetaTextBlock}>
+                    <Text style={styles.gageMetaLabel}>Validation</Text>
+                    <Text style={styles.gageMetaValue}>
+                      {gageValidationCount} / {orderedPlayers.length}
+                    </Text>
                   </View>
                 </View>
               </View>
 
+              {user && !hasValidated ? (
+                <View style={styles.actions}>
+                  <Button
+                    label="Gage relevé !"
+                    size="lg"
+                    leftIcon={
+                      <Ionicons name="checkmark-circle-outline" size={22} color={COLORS.text} />
+                    }
+                    onPress={() => handleGageValidation(user.uid, true)}
+                    style={styles.primaryButton}
+                  />
+                  <Button
+                    label="Gage refusé"
+                    variant="ghost"
+                    size="md"
+                    onPress={() => handleGageValidation(user.uid, false)}
+                  />
+                </View>
+              ) : (
+                <Text style={styles.feedbackText}>En attente des autres joueurs...</Text>
+              )}
+            </View>
+          ) : (
+            <>
               <View style={styles.gameCard}>
                 <View style={styles.sectionHeader}>
                   <Ionicons name="game-controller-outline" size={22} color={COLORS.neonBlue} />
@@ -215,19 +215,10 @@ export default function PlayScreen() {
                 <Text style={styles.gameTitle}>{currentMiniGame.name}</Text>
                 <Text style={styles.gameDescription}>{currentMiniGame.description}</Text>
 
-                <View style={styles.placeholderArea}>
-                  <View style={styles.placeholderBadge}>
-                    <Ionicons name="construct-outline" size={20} color={COLORS.neonBlue} />
-                  </View>
-                  <Text style={styles.placeholderTitle}>Jeu à venir</Text>
-                  <Text style={styles.placeholderText}>
-                    La zone interactive du mini-jeu prendra place ici dès que le gameplay sera
-                    intégré.
-                  </Text>
-                </View>
+                {renderMiniGame()}
 
                 <View style={styles.timerPill}>
-                  <Text style={styles.timerValue}>{currentMiniGame.durationSeconds}</Text>
+                  <Text style={styles.timerValue}>{timeLeft}</Text>
                   <Text style={styles.timerUnit}>sec</Text>
                 </View>
               </View>
@@ -268,31 +259,6 @@ export default function PlayScreen() {
                     </View>
                   ))}
                 </View>
-              </View>
-
-              <View style={styles.actions}>
-                <Button
-                  label={isGameFinished ? 'Voir le classement final' : 'Lancer le prochain tour'}
-                  size="lg"
-                  leftIcon={
-                    <Ionicons
-                      name={isGameFinished ? 'trophy-outline' : 'play-forward-outline'}
-                      size={22}
-                      color={COLORS.text}
-                    />
-                  }
-                  onPress={
-                    isGameFinished ? () => router.push(`/results/${game.id}`) : handleNextTurn
-                  }
-                  isLoading={isAdvancingTurn}
-                  style={styles.primaryButton}
-                />
-                <Button
-                  label="Retour au lobby"
-                  variant="ghost"
-                  size="md"
-                  onPress={() => router.push(`/lobby/${game.id}`)}
-                />
               </View>
             </>
           )}
@@ -493,6 +459,12 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     textTransform: 'uppercase',
   },
+  loserText: {
+    color: '#FF76C8',
+    fontSize: FONT_SIZE.lg,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
   gageText: {
     color: COLORS.text,
     fontSize: FONT_SIZE.xxl,
@@ -688,7 +660,6 @@ const styles = StyleSheet.create({
   },
   actions: {
     width: '100%',
-    maxWidth: 400,
     gap: SPACING.sm,
   },
   primaryButton: {

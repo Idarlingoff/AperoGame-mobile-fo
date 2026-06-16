@@ -31,6 +31,7 @@ export interface Turn {
   gageValidations: Record<string, boolean>;
   gageRefused: boolean;
   status: 'mini-game' | 'gage-validation' | 'done';
+  startedAt: number;
 }
 
 export interface Game {
