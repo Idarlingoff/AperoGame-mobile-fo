@@ -2,8 +2,8 @@ import { Button } from '@/src/components/ui';
 import { BORDER_RADIUS, COLORS, FONT_SIZE, SPACING } from '@/src/constants';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -45,7 +45,7 @@ export default function HomeScreen() {
               variant="outline"
               size="lg"
               leftIcon={<Ionicons name="person-add-outline" size={22} color={COLORS.primary} />}
-              onPress={() => {}}
+              onPress={() => router.push('/register')}
               style={styles.secondaryCta}
             />
           </View>

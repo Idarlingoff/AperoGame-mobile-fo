@@ -12,6 +12,7 @@
     },
     "android": {
       "package": "com.aperogame.mobile",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE"
       },
@@ -22,7 +23,6 @@
       "output": "static"
     },
     "plugins": [
-      "@react-native-firebase/app",
       "expo-router",
       [
         "expo-splash-screen",
