@@ -1,19 +1,11 @@
 {
   "rules": {
     "gameCodes": {
-      "$code": {
-        ".read": "auth != null",
-        ".write": "auth != null"
-      }
+      "$code": { ".read": "auth != null", ".write": "auth != null" }
     },
-
     "games": {
-      "$gameId": {
-        ".read": "auth != null",
-        ".write": "auth != null"
-      }
+      "$gameId": { ".read": "auth != null", ".write": "auth != null" }
     },
-
     "presence": {
       "$uid": {
         ".read": "auth != null && auth.uid === $uid",
