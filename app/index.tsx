@@ -28,7 +28,7 @@ export default function HomeScreen() {
           <Text style={styles.logoBottom}>BATTLE 🍺</Text>
         </View>
 
-        <Text style={styles.subtitle}>Le jeu qui ruine les reputations</Text>
+        <Text style={styles.subtitle}>Le jeu qui ruine les réputations</Text>
 
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Es-tu prêt à relever les défis ?</Text>

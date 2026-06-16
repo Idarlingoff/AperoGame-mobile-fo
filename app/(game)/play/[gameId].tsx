@@ -221,10 +221,10 @@ export default function PlayScreen() {
                   <View style={styles.placeholderBadge}>
                     <Ionicons name="construct-outline" size={20} color={COLORS.neonBlue} />
                   </View>
-                  <Text style={styles.placeholderTitle}>Jeu a venir</Text>
+                  <Text style={styles.placeholderTitle}>Jeu à venir</Text>
                   <Text style={styles.placeholderText}>
-                    La zone interactive du mini-jeu prendra place ici des que le gameplay sera
-                    integre.
+                    La zone interactive du mini-jeu prendra place ici dès que le gameplay sera
+                    intégré.
                   </Text>
                 </View>
 
@@ -290,7 +290,7 @@ export default function PlayScreen() {
                   style={styles.primaryButton}
                 />
                 <Button
-                  label={isGameFinished ? 'Retour au lobby' : 'Retour au lobby'}
+                  label="Retour au lobby"
                   variant="ghost"
                   size="md"
                   onPress={() => router.push(`/lobby/${game.id}`)}

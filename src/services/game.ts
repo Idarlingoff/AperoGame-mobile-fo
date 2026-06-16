@@ -96,7 +96,7 @@ type CreateGameInput = {
 
 export const createGame = async ({
   gageLevel,
-  hostDisplayName = 'Hote',
+  hostDisplayName = 'Hôte',
   maxPlayers,
   selectedMiniGames,
 }: CreateGameInput): Promise<Game> => {

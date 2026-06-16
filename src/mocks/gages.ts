@@ -4,14 +4,14 @@ export const mockGagesByLevel: Record<GageLevel, Gage[]> = {
   soft: [
     {
       id: 'soft-1',
-      text: 'Fais un compliment sincere au joueur de ton choix.',
+      text: 'Fais un compliment sincère au joueur de ton choix.',
       emoji: ':)',
       level: 'soft',
       drinksIfRefused: 1,
     },
     {
       id: 'soft-2',
-      text: 'Raconte ton anecdote la plus genante en 15 secondes.',
+      text: 'Raconte ton anecdote la plus gênante en 15 secondes.',
       emoji: ':D',
       level: 'soft',
       drinksIfRefused: 1,
@@ -41,7 +41,7 @@ export const mockGagesByLevel: Record<GageLevel, Gage[]> = {
     },
     {
       id: 'epice-3',
-      text: 'Fais deviner une celebrite avec un mime de 15 secondes.',
+      text: 'Fais deviner une célébrité avec un mime de 15 secondes.',
       emoji: ';)',
       level: 'epice',
       drinksIfRefused: 2,
@@ -50,21 +50,21 @@ export const mockGagesByLevel: Record<GageLevel, Gage[]> = {
   chaos: [
     {
       id: 'chaos-1',
-      text: 'Improvises un discours de victoire totalement absurde.',
+      text: 'Improvise un discours de victoire totalement absurde.',
       emoji: '!*',
       level: 'chaos',
       drinksIfRefused: 3,
     },
     {
       id: 'chaos-2',
-      text: 'Parle avec un accent impose pendant le prochain tour.',
+      text: 'Parle avec un accent imposé pendant le prochain tour.',
       emoji: '??',
       level: 'chaos',
       drinksIfRefused: 3,
     },
     {
       id: 'chaos-3',
-      text: 'Defie le groupe avec une imitation improvisee de 20 secondes.',
+      text: 'Défie le groupe avec une imitation improvisée de 20 secondes.',
       emoji: '!!',
       level: 'chaos',
       drinksIfRefused: 3,

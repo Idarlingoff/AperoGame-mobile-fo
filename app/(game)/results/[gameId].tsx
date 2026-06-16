@@ -79,7 +79,6 @@ export default function ResultsScreen() {
   const winner = rankedPlayers[0] ?? null;
   const secondPlayer = rankedPlayers[1] ?? null;
   const thirdPlayer = rankedPlayers[2] ?? null;
-  const remainingPlayers = rankedPlayers.slice(3);
   const totalDrinks = rankedPlayers.reduce((total, player) => total + player.drinksCount, 0);
   const totalLivesLeft = rankedPlayers.reduce((total, player) => total + player.lives, 0);
   const isFinished = game?.status === 'finished';
@@ -125,14 +124,14 @@ export default function ResultsScreen() {
             <View style={styles.feedbackCard}>
               <ActivityIndicator size="large" color={COLORS.neonBlue} />
               <Text style={styles.feedbackTitle}>Chargement du classement</Text>
-              <Text style={styles.feedbackText}>Preparation des scores de fin de partie...</Text>
+              <Text style={styles.feedbackText}>Préparation des scores de fin de partie...</Text>
             </View>
           ) : errorMessage || !game || rankedPlayers.length === 0 ? (
             <View style={styles.feedbackCard}>
               <Ionicons name="alert-circle-outline" size={36} color={COLORS.error} />
-              <Text style={styles.feedbackTitle}>Resultats indisponibles</Text>
+              <Text style={styles.feedbackTitle}>Résultats indisponibles</Text>
               <Text style={styles.feedbackText}>
-                {errorMessage || 'Impossible d afficher le classement de cette partie.'}
+                {errorMessage || "Impossible d'afficher le classement de cette partie."}
               </Text>
               <Button
                 label="Retour"
@@ -146,12 +145,12 @@ export default function ResultsScreen() {
             <>
               <View style={styles.summaryCard}>
                 <Text style={styles.summaryTitle}>
-                  {isFinished ? 'Classement final' : 'Apercu du classement'}
+                  {isFinished ? 'Classement final' : 'Aperçu du classement'}
                 </Text>
                 <Text style={styles.summaryText}>
                   {isFinished
-                    ? 'La partie est terminee. Voici le classement de la table.'
-                    : 'La partie n est pas encore terminee, mais tu peux deja visualiser les scores.'}
+                    ? 'La partie est terminée. Voici le classement de la table.'
+                    : "La partie n'est pas encore terminée, mais tu peux déjà visualiser les scores."}
                 </Text>
               </View>
 
@@ -193,7 +192,7 @@ export default function ResultsScreen() {
               <View style={styles.statsRow}>
                 <View style={styles.statCard}>
                   <Ionicons name="repeat-outline" size={22} color={COLORS.neonBlue} />
-                  <Text style={styles.statLabel}>Tours joues</Text>
+                  <Text style={styles.statLabel}>Tours joués</Text>
                   <Text style={styles.statValue}>{game.currentTurnNumber}</Text>
                 </View>
 
@@ -241,13 +240,12 @@ export default function ResultsScreen() {
                     </View>
                   ))}
 
-                  {remainingPlayers.length === 0 ? null : null}
                 </View>
               </View>
 
               <View style={styles.recapsRow}>
                 <View style={styles.recapCard}>
-                  <Text style={styles.recapLabel}>Coups distribues</Text>
+                  <Text style={styles.recapLabel}>Coups distribués</Text>
                   <Text style={styles.recapValue}>{totalDrinks}</Text>
                 </View>
 
@@ -266,7 +264,7 @@ export default function ResultsScreen() {
                   style={styles.primaryButton}
                 />
                 <Button
-                  label={isFinished ? 'Retour a l accueil' : 'Retour au jeu'}
+                  label={isFinished ? "Retour à l'accueil" : 'Retour au jeu'}
                   variant="ghost"
                   size="md"
                   onPress={() => router.push(isFinished ? '/' : `/play/${game.id}`)}

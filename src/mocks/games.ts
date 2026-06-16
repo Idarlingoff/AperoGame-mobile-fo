@@ -123,7 +123,7 @@ export const mockGames: Game[] = [
       },
       'player-13': {
         uid: 'player-13',
-        displayName: 'Lea',
+        displayName: 'Léa',
         photoURL: null,
         score: 1500,
         lives: 0,
