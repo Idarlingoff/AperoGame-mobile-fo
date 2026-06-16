@@ -99,6 +99,7 @@ export default function PlayScreen() {
   const currentTurn = game?.currentTurn ?? null;
   const currentMiniGame = currentTurn ? MINI_GAMES[currentTurn.miniGameId] : null;
   const gageValidationCount = currentTurn ? Object.keys(currentTurn.gageValidations).length : 0;
+  const isGameFinished = game?.status === 'finished';
 
   const handleNextTurn = async () => {
     if (!game) {
@@ -273,16 +274,23 @@ export default function PlayScreen() {
 
               <View style={styles.actions}>
                 <Button
-                  label="Lancer le prochain tour"
+                  label={isGameFinished ? 'Voir le classement final' : 'Lancer le prochain tour'}
                   size="lg"
-                  leftIcon={<Ionicons name="play-forward-outline" size={22} color={COLORS.text} />}
-                  onPress={handleNextTurn}
+                  leftIcon={
+                    <Ionicons
+                      name={isGameFinished ? 'trophy-outline' : 'play-forward-outline'}
+                      size={22}
+                      color={COLORS.text}
+                    />
+                  }
+                  onPress={
+                    isGameFinished ? () => router.push(`/results/${game.id}`) : handleNextTurn
+                  }
                   isLoading={isAdvancingTurn}
-                  disabled={game.currentTurnNumber >= game.totalTurns}
                   style={styles.primaryButton}
                 />
                 <Button
-                  label="Retour au lobby"
+                  label={isGameFinished ? 'Retour au lobby' : 'Retour au lobby'}
                   variant="ghost"
                   size="md"
                   onPress={() => router.push(`/lobby/${game.id}`)}
