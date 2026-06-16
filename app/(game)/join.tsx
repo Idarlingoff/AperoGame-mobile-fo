@@ -1,5 +1,6 @@
 import { Button } from '@/src/components/ui';
-import { BORDER_RADIUS, COLORS, FONT_SIZE, SPACING, GAME_CODE_LENGTH } from '@/src/constants';
+import { BORDER_RADIUS, COLORS, FONT_SIZE, GAME_CODE_LENGTH, SPACING } from '@/src/constants';
+import { getGameByCode } from '@/src/services/game';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -18,9 +19,38 @@ import {
 export default function JoinGameScreen() {
   const router = useRouter();
   const [code, setCode] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formattedCode = code.toUpperCase();
   const isReady = formattedCode.length === GAME_CODE_LENGTH;
+
+  const handleJoinGame = async () => {
+    if (!isReady) {
+      return;
+    }
+
+    setErrorMessage('');
+    setIsSubmitting(true);
+
+    try {
+      const game = await getGameByCode(formattedCode);
+
+      if (!game) {
+        setErrorMessage('Aucune partie ne correspond à ce code.');
+        return;
+      }
+
+      if (game.status !== 'lobby') {
+        setErrorMessage("Cette partie n'est plus disponible.");
+        return;
+      }
+
+      router.push(`/lobby/${game.id}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -84,13 +114,16 @@ export default function JoinGameScreen() {
                 </Text>
               </View>
 
+              {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+
               <View style={styles.actions}>
                 <Button
                   label="Rejoindre la partie"
                   size="lg"
                   leftIcon={<Ionicons name="log-in-outline" size={22} color={COLORS.text} />}
-                  onPress={() => {}}
+                  onPress={handleJoinGame}
                   disabled={!isReady}
+                  isLoading={isSubmitting}
                   style={styles.cta}
                 />
                 <Button
@@ -291,6 +324,12 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     fontSize: FONT_SIZE.sm,
     textAlign: 'center',
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: FONT_SIZE.sm,
+    fontWeight: '600',
+    lineHeight: 20,
   },
   actions: {
     gap: SPACING.sm,
