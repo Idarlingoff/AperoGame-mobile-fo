@@ -2,8 +2,8 @@ import { Button } from '@/src/components/ui';
 import { BORDER_RADIUS, COLORS, FONT_SIZE, SPACING } from '@/src/constants';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const router = useRouter();

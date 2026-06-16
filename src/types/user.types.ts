@@ -12,4 +12,6 @@ export interface UserStats {
   gagesCompleted: number;
   gagesRefused: number;
   wins: number;
+  totalDrinksGiven: number;
+  totalDrinksReceived: number;
 }

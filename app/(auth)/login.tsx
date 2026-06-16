@@ -325,6 +325,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)',
     color: COLORS.text,
     fontSize: FONT_SIZE.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  error: {
+    color: COLORS.error,
+    fontSize: FONT_SIZE.sm,
+  },
+  link: {
+    color: COLORS.primary,
+    textAlign: 'center',
+    fontSize: FONT_SIZE.sm,
+    marginTop: SPACING.sm,
   },
   errorText: {
     color: COLORS.error,
