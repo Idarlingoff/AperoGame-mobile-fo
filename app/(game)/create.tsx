@@ -18,12 +18,12 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const miniGameOptions = Object.values(MINI_GAMES);
 const defaultPlayerCount = Math.min(Math.max(3, MIN_PLAYERS), MAX_PLAYERS);
