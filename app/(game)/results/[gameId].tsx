@@ -1,10 +1,12 @@
 import { Button } from '@/src/components/ui';
 import { BORDER_RADIUS, COLORS, FONT_SIZE, MAX_LIVES, SPACING } from '@/src/constants';
-import { getGameById } from '@/src/services/game';
-import type { Game } from '@/src/types';
+import { saveGameHistory } from '@/src/features/game';
+import { useGame } from '@/src/hooks';
+import { useAuthStore, useGameStore } from '@/src/store';
+import type { RTGameMeta, RTPlayer } from '@/firebase/realtime.schema';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -18,50 +20,59 @@ import {
 export default function ResultsScreen() {
   const router = useRouter();
   const { gameId } = useLocalSearchParams<{ gameId?: string | string[] }>();
-  const [game, setGame] = useState<Game | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
+  const resolvedGameId = Array.isArray(gameId) ? gameId[0] : (gameId ?? null);
 
-  const resolvedGameId = Array.isArray(gameId) ? gameId[0] : gameId;
+  const user = useAuthStore((state) => state.user);
+  const game = useGameStore((state) => state.currentGame);
+  const historySavedRef = useRef(false);
 
+  useGame(resolvedGameId, user?.uid ?? null);
+
+  // Persist the finished game to Firestore once. saveGameHistory is idempotent,
+  // so it is safe even if several clients reach this screen.
   useEffect(() => {
-    let isMounted = true;
+    if (!game || game.status !== 'finished' || historySavedRef.current) {
+      return;
+    }
+    historySavedRef.current = true;
 
-    const loadGame = async () => {
-      if (!resolvedGameId) {
-        if (isMounted) {
-          setErrorMessage('Impossible de retrouver cette partie.');
-          setIsLoading(false);
-        }
-        return;
-      }
-
-      setIsLoading(true);
-      setErrorMessage('');
-
-      const nextGame = await getGameById(resolvedGameId);
-
-      if (!isMounted) {
-        return;
-      }
-
-      if (!nextGame) {
-        setGame(null);
-        setErrorMessage('Cette partie est introuvable.');
-        setIsLoading(false);
-        return;
-      }
-
-      setGame(nextGame);
-      setIsLoading(false);
+    const meta: RTGameMeta = {
+      id: game.id,
+      code: game.code,
+      hostId: game.hostId,
+      status: game.status,
+      gageLevel: game.gageLevel,
+      maxPlayers: game.maxPlayers,
+      selectedMiniGames: game.selectedMiniGames,
+      totalTurns: game.totalTurns,
+      currentTurnNumber: game.currentTurnNumber,
+      createdAt: game.createdAt,
+      startedAt: null,
+      finishedAt: Date.now(),
     };
 
-    void loadGame();
+    const players: Record<string, RTPlayer> = Object.fromEntries(
+      Object.entries(game.players).map(([uid, player]) => [
+        uid,
+        {
+          uid: player.uid,
+          displayName: player.displayName,
+          photoURL: player.photoURL,
+          score: player.score,
+          lives: player.lives,
+          isHost: player.isHost,
+          isReady: player.isReady,
+          drinksCount: player.drinksCount,
+          online: true,
+          joinedAt: 0,
+        },
+      ]),
+    );
 
-    return () => {
-      isMounted = false;
-    };
-  }, [resolvedGameId]);
+    void saveGameHistory(meta, players);
+  }, [game]);
+
+  const isLoading = !game;
 
   const rankedPlayers = game
     ? Object.values(game.players).sort((leftPlayer, rightPlayer) => {
@@ -126,12 +137,12 @@ export default function ResultsScreen() {
               <Text style={styles.feedbackTitle}>Chargement du classement</Text>
               <Text style={styles.feedbackText}>Préparation des scores de fin de partie...</Text>
             </View>
-          ) : errorMessage || !game || rankedPlayers.length === 0 ? (
+          ) : !game || rankedPlayers.length === 0 ? (
             <View style={styles.feedbackCard}>
               <Ionicons name="alert-circle-outline" size={36} color={COLORS.error} />
               <Text style={styles.feedbackTitle}>Résultats indisponibles</Text>
               <Text style={styles.feedbackText}>
-                {errorMessage || "Impossible d'afficher le classement de cette partie."}
+                Impossible d&apos;afficher le classement de cette partie.
               </Text>
               <Button
                 label="Retour"

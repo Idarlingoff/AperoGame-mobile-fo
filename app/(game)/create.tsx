@@ -10,7 +10,8 @@ import {
   SPACING,
   TOTAL_TURNS,
 } from '@/src/constants';
-import { createGame } from '@/src/services/game';
+import { createGame } from '@/src/features/game';
+import { useAuthStore } from '@/src/store';
 import type { GageLevel, MiniGameId } from '@/src/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -72,6 +73,7 @@ const getGageLevelLabel = (value: GageLevel) => {
 
 export default function CreateGameScreen() {
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
   const [playerCount, setPlayerCount] = useState(defaultPlayerCount);
   const [gageLevel, setGageLevel] = useState<GageLevel>('epice');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameId[]>(defaultMiniGames);
@@ -106,18 +108,26 @@ export default function CreateGameScreen() {
       return;
     }
 
+    if (!user) {
+      setErrorMessage('Tu dois être connecté pour créer une partie.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const game = await createGame({
+      const gameId = await createGame({
+        hostId: user.uid,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
         maxPlayers: playerCount,
         gageLevel,
         selectedMiniGames,
       });
 
-      router.push(`/lobby/${game.id}`);
+      router.push(`/lobby/${gameId}`);
     } catch {
-      setErrorMessage("La création de partie a échoué. Réessaie dans un instant.");
+      setErrorMessage('La création de partie a échoué. Réessaie dans un instant.');
     } finally {
       setIsSubmitting(false);
     }

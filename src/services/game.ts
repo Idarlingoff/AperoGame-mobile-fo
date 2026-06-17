@@ -74,6 +74,7 @@ const buildTurn = (game: Game, turnNumber: number): Turn => {
     gageValidations: {},
     gageRefused: false,
     status: 'mini-game',
+    startedAt: Date.now(),
   };
 };
 

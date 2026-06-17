@@ -1,93 +1,15 @@
 {
   "rules": {
-    "games": {
-      "$gameCode": {
-
-        "meta": {
-          ".read": "auth != null && root.child('games').child($gameCode).child('players').child(auth.uid).exists()",
-          ".write": false,
-
-          ".validate": "newData.hasChildren(['id','code','hostId','status','gageLevel','maxPlayers','selectedMiniGames','totalTurns','currentTurnNumber','createdAt'])",
-
-          "status": {
-            ".validate": "newData.val() === 'lobby' || newData.val() === 'playing' || newData.val() === 'gage' || newData.val() === 'finished'"
-          },
-          "gageLevel": {
-            ".validate": "newData.val() === 'soft' || newData.val() === 'epice' || newData.val() === 'chaos'"
-          },
-          "maxPlayers": {
-            ".validate": "newData.isNumber() && newData.val() >= 2 && newData.val() <= 10"
-          },
-
-          "$other": { ".validate": true }
-        },
-
-        "players": {
-          "$uid": {
-            ".read": "auth != null && (auth.uid === $uid || root.child('games').child($gameCode).child('players').child(auth.uid).exists())",
-
-            ".write": "auth != null && auth.uid === $uid",
-
-            ".validate": "newData.hasChildren(['uid','displayName','isHost','isReady','score','lives','drinksCount','online','joinedAt'])",
-
-            "uid":         { ".validate": "newData.val() === auth.uid" },
-            "isHost":      { ".validate": "newData.isBoolean()" },
-            "isReady":     { ".validate": "newData.isBoolean()" },
-            "online":      { ".validate": "newData.isBoolean()" },
-            "score":       { ".validate": "newData.isNumber() && newData.val() >= 0" },
-            "lives":       { ".validate": "newData.isNumber() && newData.val() >= 0" },
-            "drinksCount": { ".validate": "newData.isNumber() && newData.val() >= 0" },
-            "joinedAt":    { ".validate": "newData.isNumber()" },
-
-            "$other": { ".validate": true }
-          }
-        },
-
-        "currentTurn": {
-          ".read": "auth != null && root.child('games').child($gameCode).child('players').child(auth.uid).exists()",
-
-          ".write": "auth != null && root.child('games').child($gameCode).child('meta').child('hostId').val() === auth.uid",
-
-          "status": {
-            ".validate": "newData.val() === 'mini-game' || newData.val() === 'gage-validation' || newData.val() === 'done'"
-          },
-
-          "gageValidations": {
-            "$uid": {
-              ".write": "auth != null && auth.uid === $uid && root.child('games').child($gameCode).child('players').child(auth.uid).exists()",
-              ".validate": "newData.isBoolean()"
-            }
-          },
-
-          "results": {
-            "$uid": {
-              ".write": "auth != null && auth.uid === $uid && root.child('games').child($gameCode).child('players').child(auth.uid).exists()",
-              ".validate": "newData.hasChildren(['playerId','score','hasWon'])"
-            }
-          },
-
-          "$other": { ".validate": true }
-        },
-
-        "turns": {
-          "$turnNumber": {
-            ".read": "auth != null && root.child('games').child($gameCode).child('players').child(auth.uid).exists()",
-            ".write": "auth != null && root.child('games').child($gameCode).child('meta').child('hostId').val() === auth.uid",
-            "$other": { ".validate": true }
-          }
-        }
-      }
+    "gameCodes": {
+      "$code": { ".read": "auth != null", ".write": "auth != null" }
     },
-
+    "games": {
+      "$gameId": { ".read": "auth != null", ".write": "auth != null" }
+    },
     "presence": {
       "$uid": {
-        ".read":  "auth != null && auth.uid === $uid",
-        ".write": "auth != null && auth.uid === $uid",
-        ".validate": "newData.hasChildren(['online','lastSeen'])",
-        "online":          { ".validate": "newData.isBoolean()" },
-        "lastSeen":        { ".validate": "newData.isNumber()" },
-        "currentGameCode": { ".validate": "newData.isString() || newData.val() === null" },
-        "$other":          { ".validate": false }
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
       }
     }
   }
