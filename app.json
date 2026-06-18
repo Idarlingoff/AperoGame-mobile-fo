@@ -37,7 +37,7 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true,
-      "baseUrl": "/AperoGame-mobile"
+      "baseUrl": "/AperoGame-mobile-fo"
     }
   }
 }
