@@ -48,6 +48,9 @@ jobs:
       - name: Build web app
         run: npx expo export --platform web
 
+      - name: SPA fallback for dynamic routes
+        run: cp dist/index.html dist/404.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
