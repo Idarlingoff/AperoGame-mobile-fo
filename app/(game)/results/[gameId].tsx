@@ -271,7 +271,7 @@ export default function ResultsScreen() {
                   label="Nouvelle partie"
                   size="lg"
                   leftIcon={<Ionicons name="sparkles-outline" size={22} color={COLORS.text} />}
-                  onPress={() => router.push('/create')}
+                  onPress={() => router.push('/(game)/menu')}
                   style={styles.primaryButton}
                 />
                 <Button
