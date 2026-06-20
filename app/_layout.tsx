@@ -19,7 +19,7 @@ function RootNavigator() {
     if (!user && !inAuthGroup) {
       router.replace('/');
     } else if (user && (inAuthGroup || !inGameGroup)) {
-      router.replace('/(game)/create');
+      router.replace('/hub');
     }
   }, [user, isLoading, segments, router]);
 

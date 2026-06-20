@@ -10,12 +10,12 @@ import { useEffect } from 'react';
 import {
   ActivityIndicator,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PlayScreen() {
   const router = useRouter();
@@ -33,12 +33,10 @@ export default function PlayScreen() {
   const currentTurn = game?.currentTurn ?? null;
   const currentMiniGame = currentTurn ? MINI_GAMES[currentTurn.miniGameId] : null;
 
-  // Reset the per-device mini-game guard at the start of each turn.
   useEffect(() => {
     reset();
   }, [currentTurn?.number, reset]);
 
-  // Everyone is sent to the results screen once the game finishes.
   useEffect(() => {
     if (game?.status === 'finished' && resolvedGameId) {
       router.push(`/results/${resolvedGameId}`);

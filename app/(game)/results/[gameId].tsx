@@ -10,12 +10,12 @@ import { useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ResultsScreen() {
   const router = useRouter();
@@ -28,8 +28,6 @@ export default function ResultsScreen() {
 
   useGame(resolvedGameId, user?.uid ?? null);
 
-  // Persist the finished game to Firestore once. saveGameHistory is idempotent,
-  // so it is safe even if several clients reach this screen.
   useEffect(() => {
     if (!game || game.status !== 'finished' || historySavedRef.current) {
       return;

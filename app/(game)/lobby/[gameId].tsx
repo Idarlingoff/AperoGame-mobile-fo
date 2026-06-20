@@ -9,12 +9,12 @@ import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LobbyScreen() {
   const router = useRouter();
@@ -29,7 +29,6 @@ export default function LobbyScreen() {
 
   useGame(resolvedGameId, user?.uid ?? null);
 
-  // Everyone is sent to the play screen once the host launches the game.
   useEffect(() => {
     if (game?.status === 'playing' && resolvedGameId) {
       router.push(`/play/${resolvedGameId}`);
@@ -63,7 +62,6 @@ export default function LobbyScreen() {
 
     try {
       await startGame(resolvedGameId);
-      // Navigation is handled by the effect above once status flips to 'playing'.
     } catch {
       setErrorMessage('Impossible de lancer cette partie.');
     } finally {
